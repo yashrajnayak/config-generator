@@ -1,5 +1,5 @@
-/* Import all CSS modules */
+/* Main CSS - Import all modules */
+@import 'variables.css';
 @import 'base.css';
 @import 'components.css';
 @import 'wizard.css';
-@import 'responsive.css';

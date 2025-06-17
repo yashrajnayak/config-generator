@@ -1,158 +1,139 @@
-// Wizard Controller - Manages the step-by-step interface
+// Modern Wizard Controller with smooth animations and better UX
 import { WizardSteps } from './wizard-steps.js';
 
 export class WizardController {
     constructor() {
         this.currentStep = 0;
-        this.totalSteps = 7; // Basic Info, Social Links, About, Experience, Projects, Skills, Settings
+        this.totalSteps = 7;
         this.stepData = {};
-        this.container = null;
         this.wizardSteps = new WizardSteps();
+        this.isAnimating = false;
     }
 
-    init(container) {
-        this.container = container;
-        this.render();
+    init() {
+        this.setupEventListeners();
         this.showStep(0);
     }
 
-    render() {
-        this.container.innerHTML = `
-            <div class="progress-bar">
-                <div class="progress-fill" id="progress-fill"></div>
-            </div>
-            
-            <div class="step-navigation" id="step-navigation">
-                <div class="step-indicator">
-                    <div class="step-number active" id="step-number">1</div>
-                    <div class="step-info">
-                        <h3 id="step-title">Basic Information</h3>
-                        <p id="step-subtitle">Let's start with your basic details</p>
-                    </div>
-                </div>
-                <div class="step-counter">
-                    <span id="step-counter">Step 1 of ${this.totalSteps}</span>
-                </div>
-            </div>
-
-            <div class="step-content" id="step-content">
-                <!-- Step content will be loaded here -->
-            </div>
-
-            <div class="step-actions">
-                <button class="btn btn-secondary" id="prev-btn" style="visibility: hidden;">
-                    ← Previous
-                </button>
-                <div class="btn-group">
-                    <button class="btn btn-secondary" id="preview-btn">
-                        👁️ Preview
-                    </button>
-                    <button class="btn" id="next-btn">
-                        Next →
-                    </button>
-                </div>
-            </div>
-        `;
-
-        this.setupEventListeners();
-    }
-
     setupEventListeners() {
-        const prevBtn = document.getElementById('prev-btn');
-        const nextBtn = document.getElementById('next-btn');
-        const previewBtn = document.getElementById('preview-btn');
+        // Navigation buttons
+        document.getElementById('prev-button').addEventListener('click', () => this.previousStep());
+        document.getElementById('next-button').addEventListener('click', () => this.nextStep());
+        document.getElementById('close-wizard').addEventListener('click', () => this.closeWizard());
 
-        prevBtn.addEventListener('click', () => this.previousStep());
-        nextBtn.addEventListener('click', () => this.nextStep());
-        previewBtn.addEventListener('click', () => this.togglePreview());
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                this.closeWizard();
+            }
+        });
     }
 
     showStep(stepIndex) {
+        if (this.isAnimating) return;
+        
         this.currentStep = stepIndex;
         this.updateProgress();
         this.updateNavigation();
         this.loadStepContent();
-        this.updateButtons();
     }
 
     updateProgress() {
         const progress = ((this.currentStep + 1) / this.totalSteps) * 100;
         const progressFill = document.getElementById('progress-fill');
+        const stepCounter = document.getElementById('step-counter');
+        
         if (progressFill) {
             progressFill.style.width = `${progress}%`;
+        }
+        
+        if (stepCounter) {
+            stepCounter.textContent = `Step ${this.currentStep + 1} of ${this.totalSteps}`;
         }
     }
 
     updateNavigation() {
-        const stepNumber = document.getElementById('step-number');
-        const stepTitle = document.getElementById('step-title');
-        const stepSubtitle = document.getElementById('step-subtitle');
-        const stepCounter = document.getElementById('step-counter');
+        const prevButton = document.getElementById('prev-button');
+        const nextButton = document.getElementById('next-button');
 
-        const steps = [
-            { title: 'Basic Information', subtitle: 'Your name, tagline, and GitHub username' },
-            { title: 'Social Links', subtitle: 'Connect your professional profiles' },
-            { title: 'About Section', subtitle: 'Tell your story' },
-            { title: 'Experience', subtitle: 'Your work history and achievements' },
-            { title: 'Projects', subtitle: 'Showcase your best work' },
-            { title: 'Skills', subtitle: 'Your technical and professional abilities' },
-            { title: 'Settings', subtitle: 'SEO, features, and final touches' }
-        ];
-
-        if (stepNumber) stepNumber.textContent = this.currentStep + 1;
-        if (stepTitle) stepTitle.textContent = steps[this.currentStep].title;
-        if (stepSubtitle) stepSubtitle.textContent = steps[this.currentStep].subtitle;
-        if (stepCounter) stepCounter.textContent = `Step ${this.currentStep + 1} of ${this.totalSteps}`;
+        // Previous button
+        prevButton.disabled = this.currentStep === 0;
+        
+        // Next button
+        if (this.currentStep === this.totalSteps - 1) {
+            nextButton.textContent = '✨ Generate Config';
+            nextButton.classList.add('btn-primary');
+        } else {
+            nextButton.textContent = 'Next →';
+            nextButton.classList.remove('btn-primary');
+        }
     }
 
-    loadStepContent() {
-        const stepContent = document.getElementById('step-content');
-        if (!stepContent) return;
+    async loadStepContent() {
+        const stepInner = document.getElementById('step-inner');
+        if (!stepInner) return;
 
-        // Add animation class
-        stepContent.classList.remove('prev');
-        void stepContent.offsetWidth; // Force reflow
-        
+        // Add fade out animation
+        this.isAnimating = true;
+        stepInner.style.opacity = '0';
+        stepInner.style.transform = 'translateY(20px)';
+
+        // Wait for animation
+        await new Promise(resolve => setTimeout(resolve, 200));
+
+        // Load new content
+        let content = '';
         switch (this.currentStep) {
             case 0:
-                stepContent.innerHTML = this.wizardSteps.getBasicInfoStep(this.stepData);
+                content = this.wizardSteps.getBasicInfoStep(this.getAllStepData());
                 break;
             case 1:
-                stepContent.innerHTML = this.wizardSteps.getSocialLinksStep(this.stepData);
+                content = this.wizardSteps.getSocialLinksStep(this.getAllStepData());
                 break;
             case 2:
-                stepContent.innerHTML = this.wizardSteps.getAboutStep(this.stepData);
+                content = this.wizardSteps.getAboutStep(this.getAllStepData());
                 break;
             case 3:
-                stepContent.innerHTML = this.wizardSteps.getExperienceStep(this.stepData);
+                content = this.wizardSteps.getExperienceStep(this.getAllStepData());
                 break;
             case 4:
-                stepContent.innerHTML = this.wizardSteps.getProjectsStep(this.stepData);
+                content = this.wizardSteps.getProjectsStep(this.getAllStepData());
                 break;
             case 5:
-                stepContent.innerHTML = this.wizardSteps.getSkillsStep(this.stepData);
+                content = this.wizardSteps.getSkillsStep(this.getAllStepData());
                 break;
             case 6:
-                stepContent.innerHTML = this.wizardSteps.getSettingsStep(this.stepData);
+                content = this.wizardSteps.getSettingsStep(this.getAllStepData());
                 break;
         }
 
+        stepInner.innerHTML = content;
+
         // Setup step-specific event listeners
         this.setupStepEventListeners();
+
+        // Fade in animation
+        stepInner.style.opacity = '1';
+        stepInner.style.transform = 'translateY(0)';
+        
+        this.isAnimating = false;
+
+        // Focus first input
+        const firstInput = stepInner.querySelector('input, textarea');
+        if (firstInput) {
+            setTimeout(() => firstInput.focus(), 300);
+        }
     }
 
     setupStepEventListeners() {
-        // Add dynamic list functionality
-        this.setupDynamicLists();
-        
-        // Setup form change listeners
+        // Form input listeners
         const inputs = document.querySelectorAll('input, textarea, select');
         inputs.forEach(input => {
             input.addEventListener('input', () => this.collectStepData());
             input.addEventListener('change', () => this.collectStepData());
         });
 
-        // Setup toggle switches
+        // Toggle switches
         const toggles = document.querySelectorAll('.toggle-switch');
         toggles.forEach(toggle => {
             toggle.addEventListener('click', () => {
@@ -160,73 +141,82 @@ export class WizardController {
                 this.collectStepData();
             });
         });
+
+        // Dynamic list buttons
+        this.setupDynamicListButtons();
     }
 
-    setupDynamicLists() {
-        // Add item buttons
-        const addButtons = document.querySelectorAll('.btn-add');
+    setupDynamicListButtons() {
+        // Add buttons
+        const addButtons = document.querySelectorAll('.add-button');
         addButtons.forEach(btn => {
             btn.addEventListener('click', (e) => {
-                const listType = e.target.dataset.listType;
-                this.addListItem(listType);
+                const buttonId = e.target.closest('button').id;
+                this.addListItem(buttonId);
             });
         });
 
-        // Remove item buttons
-        const removeButtons = document.querySelectorAll('.btn-remove');
-        removeButtons.forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const item = e.target.closest('.dynamic-list-item');
-                if (item) {
-                    item.remove();
-                    this.collectStepData();
-                }
-            });
-        });
+        // Remove buttons are handled inline with onclick
     }
 
-    addListItem(listType) {
-        const container = document.querySelector(`[data-list="${listType}"]`);
-        if (!container) return;
-
-        let itemHTML = '';
-        switch (listType) {
-            case 'social-links':
-                itemHTML = this.wizardSteps.getSocialLinkItemTemplate();
+    addListItem(buttonId) {
+        let listContainer, template;
+        
+        switch (buttonId) {
+            case 'add-social-link':
+                listContainer = document.getElementById('social-links-list');
+                template = this.wizardSteps.getSocialLinkItem();
                 break;
-            case 'experience':
-                itemHTML = this.wizardSteps.getExperienceItemTemplate();
+            case 'add-experience':
+                listContainer = document.getElementById('experience-list');
+                template = this.wizardSteps.getExperienceItem();
                 break;
-            case 'projects':
-                itemHTML = this.wizardSteps.getProjectItemTemplate();
+            case 'add-project':
+                listContainer = document.getElementById('projects-list');
+                template = this.wizardSteps.getProjectItem();
                 break;
-            case 'skills':
-                itemHTML = this.wizardSteps.getSkillCategoryTemplate();
+            case 'add-skill-category':
+                listContainer = document.getElementById('skills-list');
+                template = this.wizardSteps.getSkillCategoryItem();
                 break;
         }
 
-        const wrapper = document.createElement('div');
-        wrapper.innerHTML = itemHTML;
-        const newItem = wrapper.firstElementChild;
-        
-        container.appendChild(newItem);
-        this.setupStepEventListeners();
-        
-        // Focus on first input
-        const firstInput = newItem.querySelector('input, textarea');
-        if (firstInput) {
-            firstInput.focus();
+        if (listContainer && template) {
+            const wrapper = document.createElement('div');
+            wrapper.innerHTML = template;
+            const newItem = wrapper.firstElementChild;
+            
+            // Add animation
+            newItem.style.opacity = '0';
+            newItem.style.transform = 'translateY(20px)';
+            
+            listContainer.appendChild(newItem);
+            
+            // Animate in
+            setTimeout(() => {
+                newItem.style.opacity = '1';
+                newItem.style.transform = 'translateY(0)';
+            }, 50);
+
+            // Setup event listeners for new item
+            this.setupStepEventListeners();
+            
+            // Focus first input
+            const firstInput = newItem.querySelector('input, textarea');
+            if (firstInput) {
+                setTimeout(() => firstInput.focus(), 300);
+            }
         }
     }
 
     collectStepData() {
-        const stepContent = document.getElementById('step-content');
-        if (!stepContent) return;
+        const stepInner = document.getElementById('step-inner');
+        if (!stepInner) return;
 
-        const formData = new FormData();
-        const inputs = stepContent.querySelectorAll('input, textarea, select');
-        
         const data = {};
+        
+        // Collect form inputs
+        const inputs = stepInner.querySelectorAll('input, textarea, select');
         inputs.forEach(input => {
             if (input.type === 'checkbox') {
                 data[input.name] = input.checked;
@@ -235,21 +225,22 @@ export class WizardController {
             }
         });
 
-        // Handle toggle switches
-        const toggles = stepContent.querySelectorAll('.toggle-switch.active');
+        // Collect toggle switches
+        const toggles = stepInner.querySelectorAll('.toggle-switch');
         toggles.forEach(toggle => {
-            const name = toggle.dataset.feature;
-            if (name) {
-                data[name] = true;
+            const feature = toggle.dataset.feature;
+            if (feature) {
+                data[feature] = toggle.classList.contains('active');
             }
         });
 
-        // Handle dynamic lists
-        this.collectDynamicListData(data, stepContent);
+        // Collect dynamic lists
+        this.collectDynamicListData(data, stepInner);
 
+        // Store step data
         this.stepData[this.currentStep] = data;
-        
-        // Emit config update event
+
+        // Emit update event
         document.dispatchEvent(new CustomEvent('wizard:configUpdated', {
             detail: this.getAllStepData()
         }));
@@ -257,7 +248,7 @@ export class WizardController {
 
     collectDynamicListData(data, container) {
         // Social links
-        const socialItems = container.querySelectorAll('[data-list="social-links"] .dynamic-list-item');
+        const socialItems = container.querySelectorAll('#social-links-list .dynamic-item');
         if (socialItems.length > 0) {
             data.socialLinks = Array.from(socialItems).map(item => ({
                 name: item.querySelector('[name="social-name"]')?.value || '',
@@ -266,8 +257,8 @@ export class WizardController {
             })).filter(link => link.name && link.url);
         }
 
-        // Experience items
-        const expItems = container.querySelectorAll('[data-list="experience"] .dynamic-list-item');
+        // Experience
+        const expItems = container.querySelectorAll('#experience-list .dynamic-item');
         if (expItems.length > 0) {
             data.experience = Array.from(expItems).map(item => ({
                 company: item.querySelector('[name="exp-company"]')?.value || '',
@@ -278,7 +269,7 @@ export class WizardController {
         }
 
         // Projects
-        const projectItems = container.querySelectorAll('[data-list="projects"] .dynamic-list-item');
+        const projectItems = container.querySelectorAll('#projects-list .dynamic-item');
         if (projectItems.length > 0) {
             data.projects = Array.from(projectItems).map(item => ({
                 name: item.querySelector('[name="project-name"]')?.value || '',
@@ -290,9 +281,9 @@ export class WizardController {
         }
 
         // Skills
-        const skillCategories = container.querySelectorAll('[data-list="skills"] .dynamic-list-item');
-        if (skillCategories.length > 0) {
-            data.skillCategories = Array.from(skillCategories).map(item => ({
+        const skillItems = container.querySelectorAll('#skills-list .dynamic-item');
+        if (skillItems.length > 0) {
+            data.skillCategories = Array.from(skillItems).map(item => ({
                 name: item.querySelector('[name="skill-category-name"]')?.value || '',
                 items: item.querySelector('[name="skill-items"]')?.value.split('\n').filter(s => s.trim()) || []
             })).filter(category => category.name && category.items.length > 0);
@@ -300,7 +291,6 @@ export class WizardController {
     }
 
     getAllStepData() {
-        // Combine all step data into a cohesive config object
         const allData = {};
         Object.values(this.stepData).forEach(stepData => {
             Object.assign(allData, stepData);
@@ -308,26 +298,9 @@ export class WizardController {
         return allData;
     }
 
-    updateButtons() {
-        const prevBtn = document.getElementById('prev-btn');
-        const nextBtn = document.getElementById('next-btn');
-
-        if (prevBtn) {
-            prevBtn.style.visibility = this.currentStep === 0 ? 'hidden' : 'visible';
-        }
-
-        if (nextBtn) {
-            if (this.currentStep === this.totalSteps - 1) {
-                nextBtn.textContent = '✅ Generate Config';
-                nextBtn.classList.add('btn-download');
-            } else {
-                nextBtn.textContent = 'Next →';
-                nextBtn.classList.remove('btn-download');
-            }
-        }
-    }
-
-    nextStep() {
+    async nextStep() {
+        if (this.isAnimating) return;
+        
         this.collectStepData();
         
         if (this.currentStep < this.totalSteps - 1) {
@@ -338,19 +311,19 @@ export class WizardController {
         }
     }
 
-    previousStep() {
-        if (this.currentStep > 0) {
-            this.showStep(this.currentStep - 1);
-            
-            // Add animation class for reverse direction
-            const stepContent = document.getElementById('step-content');
-            if (stepContent) {
-                stepContent.classList.add('prev');
-            }
-        }
+    async previousStep() {
+        if (this.isAnimating || this.currentStep === 0) return;
+        
+        this.showStep(this.currentStep - 1);
     }
 
-    togglePreview() {
-        document.dispatchEvent(new CustomEvent('preview:toggle'));
+    closeWizard() {
+        const welcomeScreen = document.getElementById('welcome-screen');
+        const wizardContainer = document.getElementById('wizard-container');
+        
+        if (welcomeScreen && wizardContainer) {
+            wizardContainer.style.display = 'none';
+            welcomeScreen.style.display = 'flex';
+        }
     }
 }

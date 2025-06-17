@@ -1,65 +1,42 @@
-// Wizard Steps - Contains HTML templates for each step
+// Modern Wizard Steps with Typeform-like interface
 export class WizardSteps {
     
     getBasicInfoStep(data = {}) {
         return `
-            <h2>Basic Information</h2>
-            <p class="step-description">
-                Let's start with your basic details. This information will appear in your portfolio header and SEO metadata.
-            </p>
+            <div class="step-header">
+                <div class="step-number">1</div>
+                <h2 class="step-title">Let's start with the basics</h2>
+                <p class="step-subtitle">Tell us about yourself and we'll create your professional portfolio</p>
+            </div>
 
-            <div class="form-section">
-                <h3>Personal Details</h3>
-                
+            <div class="step-form">
                 <div class="form-group">
-                    <label for="name" class="form-label required">Full Name</label>
+                    <label for="name" class="form-label">What's your full name? *</label>
                     <input type="text" id="name" name="name" class="form-input" 
-                           placeholder="e.g., John Doe" value="${data.name || ''}" required>
-                    <span class="form-help">This will be displayed as your main heading</span>
+                           placeholder="e.g., Sarah Johnson" value="${data.name || ''}" required>
+                    <span class="form-help">This will be the main heading on your portfolio</span>
                 </div>
 
                 <div class="form-group">
-                    <label for="tagline" class="form-label required">Professional Tagline</label>
+                    <label for="tagline" class="form-label">How would you describe what you do? *</label>
                     <input type="text" id="tagline" name="tagline" class="form-input" 
-                           placeholder="e.g., Full Stack Developer & UI/UX Designer" value="${data.tagline || ''}" required>
-                    <span class="form-help">A brief description of what you do</span>
+                           placeholder="e.g., Full Stack Developer & UI Designer" value="${data.tagline || ''}" required>
+                    <span class="form-help">A brief, compelling description of your professional role</span>
                 </div>
 
                 <div class="form-group">
-                    <label for="github-username" class="form-label required">GitHub Username</label>
+                    <label for="github-username" class="form-label">What's your GitHub username? *</label>
                     <input type="text" id="github-username" name="githubUsername" class="form-input" 
-                           placeholder="e.g., johndoe" value="${data.githubUsername || ''}" required>
-                    <span class="form-help">Used for profile picture and GitHub projects integration</span>
+                           placeholder="e.g., sarahjohnson" value="${data.githubUsername || ''}" required>
+                    <span class="form-help">We'll use this to fetch your profile picture and featured repositories</span>
                 </div>
 
                 <div class="form-group">
-                    <label for="description" class="form-label">Portfolio Description</label>
+                    <label for="description" class="form-label">Brief portfolio description</label>
                     <input type="text" id="description" name="description" class="form-input" 
-                           placeholder="e.g., Developer Portfolio" value="${data.description || ''}">
-                    <span class="form-help">Short description for browser tabs and SEO</span>
+                           placeholder="e.g., Creative developer passionate about user experience" value="${data.description || ''}">
+                    <span class="form-help">This appears in browser tabs and search results</span>
                 </div>
-            </div>
-
-            <div class="form-section">
-                <h3>SEO & Website Settings</h3>
-                
-                <div class="form-group">
-                    <label for="website-url" class="form-label">Website URL</label>
-                    <input type="url" id="website-url" name="websiteUrl" class="form-input" 
-                           placeholder="https://yourdomain.com" value="${data.websiteUrl || ''}">
-                    <span class="form-help">Your portfolio's live URL (optional, for SEO)</span>
-                </div>
-
-                <div class="form-group">
-                    <label for="keywords" class="form-label">Keywords</label>
-                    <input type="text" id="keywords" name="keywords" class="form-input" 
-                           placeholder="developer, portfolio, javascript, react" value="${data.keywords || ''}">
-                    <span class="form-help">Comma-separated keywords for SEO</span>
-                </div>
-            </div>
-
-            <div class="alert alert-info">
-                <strong>💡 Pro Tip:</strong> Your GitHub username will automatically fetch your profile picture and repositories marked with the "featured" topic.
             </div>
         `;
     }
@@ -68,43 +45,46 @@ export class WizardSteps {
         const existingLinks = data.socialLinks || [];
         
         return `
-            <h2>Social Links</h2>
-            <p class="step-description">
-                Add your professional social media profiles. These will appear in your portfolio header and footer.
-            </p>
-
-            <div class="form-section">
-                <h3>Professional Profiles</h3>
-                
-                <div class="dynamic-list" data-list="social-links">
-                    ${existingLinks.map(link => this.getSocialLinkItemTemplate(link)).join('')}
-                    ${existingLinks.length === 0 ? this.getSocialLinkItemTemplate() : ''}
-                </div>
-                
-                <button type="button" class="btn btn-add" data-list-type="social-links">
-                    ➕ Add Another Social Link
-                </button>
+            <div class="step-header">
+                <div class="step-number">2</div>
+                <h2 class="step-title">Connect your profiles</h2>
+                <p class="step-subtitle">Add your professional social media and portfolio links</p>
             </div>
 
-            <div class="alert alert-info">
-                <strong>Available Icons:</strong> github, linkedin, twitter, instagram, youtube, website, email, medium, discord, code
+            <div class="step-form">
+                <div class="dynamic-list" id="social-links-list">
+                    ${existingLinks.length > 0 
+                        ? existingLinks.map(link => this.getSocialLinkItem(link)).join('')
+                        : this.getSocialLinkItem()
+                    }
+                </div>
+                
+                <button type="button" class="add-button" id="add-social-link">
+                    <span>+ Add another social link</span>
+                </button>
+
+                <div class="alert alert-info mt-6">
+                    <strong>💡 Available icons:</strong> github, linkedin, twitter, instagram, youtube, website, email, medium, discord
+                </div>
             </div>
         `;
     }
 
-    getSocialLinkItemTemplate(data = {}) {
+    getSocialLinkItem(data = {}) {
         return `
-            <div class="dynamic-list-item">
-                <div class="dynamic-list-header">
-                    <h4>Social Profile</h4>
-                    <button type="button" class="btn-remove">Remove</button>
+            <div class="dynamic-item">
+                <div class="dynamic-item-header">
+                    <h4 class="dynamic-item-title">Social Profile</h4>
+                    <button type="button" class="remove-button" onclick="this.closest('.dynamic-item').remove()">
+                        ✕
+                    </button>
                 </div>
                 
                 <div style="display: grid; grid-template-columns: 1fr 2fr 1fr; gap: 1rem;">
                     <div class="form-group">
-                        <label class="form-label">Platform Name</label>
+                        <label class="form-label">Platform</label>
                         <input type="text" name="social-name" class="form-input" 
-                               placeholder="e.g., LinkedIn" value="${data.name || ''}">
+                               placeholder="LinkedIn" value="${data.name || ''}">
                     </div>
                     
                     <div class="form-group">
@@ -116,7 +96,7 @@ export class WizardSteps {
                     <div class="form-group">
                         <label class="form-label">Icon</label>
                         <select name="social-icon" class="form-select">
-                            <option value="">Select...</option>
+                            <option value="">Choose...</option>
                             <option value="github" ${data.icon === 'github' ? 'selected' : ''}>GitHub</option>
                             <option value="linkedin" ${data.icon === 'linkedin' ? 'selected' : ''}>LinkedIn</option>
                             <option value="twitter" ${data.icon === 'twitter' ? 'selected' : ''}>Twitter</option>
@@ -126,7 +106,6 @@ export class WizardSteps {
                             <option value="email" ${data.icon === 'email' ? 'selected' : ''}>Email</option>
                             <option value="medium" ${data.icon === 'medium' ? 'selected' : ''}>Medium</option>
                             <option value="discord" ${data.icon === 'discord' ? 'selected' : ''}>Discord</option>
-                            <option value="code" ${data.icon === 'code' ? 'selected' : ''}>Code</option>
                         </select>
                     </div>
                 </div>
@@ -136,38 +115,37 @@ export class WizardSteps {
 
     getAboutStep(data = {}) {
         return `
-            <h2>About Section</h2>
-            <p class="step-description">
-                Tell your story! Add multiple paragraphs to describe your background, experience, and what makes you unique.
-            </p>
+            <div class="step-header">
+                <div class="step-number">3</div>
+                <h2 class="step-title">Tell your story</h2>
+                <p class="step-subtitle">Share your background, experience, and what makes you unique</p>
+            </div>
 
-            <div class="form-section">
-                <h3>Your Story</h3>
-                
+            <div class="step-form">
                 <div class="form-group">
-                    <label for="about-paragraph-1" class="form-label">First Paragraph</label>
+                    <label for="about-paragraph-1" class="form-label">Introduction paragraph</label>
                     <textarea id="about-paragraph-1" name="aboutParagraph1" class="form-textarea" 
-                              placeholder="Introduce yourself and your background...">${data.aboutParagraph1 || ''}</textarea>
-                    <span class="form-help">Start with your professional background or journey</span>
+                              placeholder="Start with your professional background or journey. For example: 'I'm a passionate full-stack developer with 5 years of experience building scalable web applications...'">${data.aboutParagraph1 || ''}</textarea>
+                    <span class="form-help">Introduce yourself and your professional background</span>
                 </div>
 
                 <div class="form-group">
-                    <label for="about-paragraph-2" class="form-label">Second Paragraph</label>
+                    <label for="about-paragraph-2" class="form-label">Skills & expertise paragraph</label>
                     <textarea id="about-paragraph-2" name="aboutParagraph2" class="form-textarea" 
-                              placeholder="Share more details about your expertise and interests...">${data.aboutParagraph2 || ''}</textarea>
+                              placeholder="Share details about your expertise and interests. For example: 'I specialize in React, Node.js, and cloud technologies. I love solving complex problems and creating intuitive user experiences...'">${data.aboutParagraph2 || ''}</textarea>
                     <span class="form-help">Talk about your skills, interests, or current role</span>
                 </div>
 
                 <div class="form-group">
-                    <label for="about-paragraph-3" class="form-label">Third Paragraph (Optional)</label>
+                    <label for="about-paragraph-3" class="form-label">Personal touch (optional)</label>
                     <textarea id="about-paragraph-3" name="aboutParagraph3" class="form-textarea" 
-                              placeholder="Add any additional information you'd like to share...">${data.aboutParagraph3 || ''}</textarea>
-                    <span class="form-help">Optional: Goals, achievements, or personal touch</span>
+                              placeholder="Add any additional information you'd like to share. For example: 'When I'm not coding, you can find me contributing to open source projects or mentoring junior developers...'">${data.aboutParagraph3 || ''}</textarea>
+                    <span class="form-help">Goals, achievements, or personal interests</span>
                 </div>
-            </div>
 
-            <div class="alert alert-info">
-                <strong>💡 Writing Tips:</strong> Keep paragraphs concise and engaging. Focus on your unique value proposition and what sets you apart as a professional.
+                <div class="alert alert-info">
+                    <strong>✍️ Writing tip:</strong> Keep each paragraph focused and engaging. Use specific examples and avoid generic statements.
+                </div>
             </div>
         `;
     }
@@ -176,67 +154,67 @@ export class WizardSteps {
         const existingExperience = data.experience || [];
         
         return `
-            <h2>Professional Experience</h2>
-            <p class="step-description">
-                Add your work history, including companies, roles, dates, and key achievements or responsibilities.
-            </p>
-
-            <div class="form-section">
-                <h3>Work History</h3>
-                
-                <div class="dynamic-list" data-list="experience">
-                    ${existingExperience.map(exp => this.getExperienceItemTemplate(exp)).join('')}
-                    ${existingExperience.length === 0 ? this.getExperienceItemTemplate() : ''}
-                </div>
-                
-                <button type="button" class="btn btn-add" data-list-type="experience">
-                    ➕ Add Another Position
-                </button>
+            <div class="step-header">
+                <div class="step-number">4</div>
+                <h2 class="step-title">Your professional journey</h2>
+                <p class="step-subtitle">Add your work experience, roles, and key achievements</p>
             </div>
 
-            <div class="alert alert-info">
-                <strong>💡 Pro Tip:</strong> List your experience in reverse chronological order (most recent first). Include specific achievements and technologies used.
+            <div class="step-form">
+                <div class="dynamic-list" id="experience-list">
+                    ${existingExperience.length > 0 
+                        ? existingExperience.map(exp => this.getExperienceItem(exp)).join('')
+                        : this.getExperienceItem()
+                    }
+                </div>
+                
+                <button type="button" class="add-button" id="add-experience">
+                    <span>+ Add another position</span>
+                </button>
+
+                <div class="alert alert-info mt-6">
+                    <strong>💼 Pro tip:</strong> List your experience in reverse chronological order (most recent first). Include specific achievements and technologies used.
+                </div>
             </div>
         `;
     }
 
-    getExperienceItemTemplate(data = {}) {
+    getExperienceItem(data = {}) {
         return `
-            <div class="dynamic-list-item">
-                <div class="dynamic-list-header">
-                    <h4>Position</h4>
-                    <button type="button" class="btn-remove">Remove</button>
+            <div class="dynamic-item">
+                <div class="dynamic-item-header">
+                    <h4 class="dynamic-item-title">Work Experience</h4>
+                    <button type="button" class="remove-button" onclick="this.closest('.dynamic-item').remove()">
+                        ✕
+                    </button>
                 </div>
                 
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
                     <div class="form-group">
-                        <label class="form-label">Company Name</label>
+                        <label class="form-label">Company</label>
                         <input type="text" name="exp-company" class="form-input" 
-                               placeholder="e.g., Google" value="${data.company || ''}">
+                               placeholder="Google" value="${data.company || ''}">
                     </div>
                     
                     <div class="form-group">
                         <label class="form-label">Job Title</label>
                         <input type="text" name="exp-role" class="form-input" 
-                               placeholder="e.g., Senior Software Engineer" value="${data.role || ''}">
+                               placeholder="Senior Software Engineer" value="${data.role || ''}">
                     </div>
                 </div>
                 
                 <div class="form-group">
                     <label class="form-label">Employment Period</label>
                     <input type="text" name="exp-date" class="form-input" 
-                           placeholder="e.g., Jan 2022 - Present" value="${data.date || ''}">
+                           placeholder="Jan 2022 - Present" value="${data.date || ''}">
                     <span class="form-help">Use format like "Jan 2022 - Present" or "2020 - 2022"</span>
                 </div>
                 
                 <div class="form-group">
-                    <label class="form-label">Key Responsibilities & Achievements</label>
+                    <label class="form-label">Key Achievements & Responsibilities</label>
                     <textarea name="exp-responsibilities" class="form-textarea" 
-                              placeholder="List one responsibility or achievement per line:
-• Developed and maintained web applications using React and Node.js
-• Led a team of 5 developers and improved deployment speed by 40%
-• Implemented CI/CD pipelines reducing bug reports by 60%">${Array.isArray(data.responsibilities) ? data.responsibilities.join('\n') : (data.responsibilities || '')}</textarea>
-                    <span class="form-help">One responsibility or achievement per line. Be specific and include metrics when possible.</span>
+                              placeholder="• Developed and maintained web applications using React and Node.js&#10;• Led a team of 5 developers and improved deployment speed by 40%&#10;• Implemented CI/CD pipelines reducing bug reports by 60%">${Array.isArray(data.responsibilities) ? data.responsibilities.join('\n') : (data.responsibilities || '')}</textarea>
+                    <span class="form-help">One achievement per line. Be specific and include metrics when possible.</span>
                 </div>
             </div>
         `;
@@ -246,75 +224,75 @@ export class WizardSteps {
         const existingProjects = data.projects || [];
         
         return `
-            <h2>Projects</h2>
-            <p class="step-description">
-                Showcase your best work! Add projects with descriptions, images, and links to demos or repositories.
-            </p>
-
-            <div class="form-section">
-                <h3>Featured Projects</h3>
-                
-                <div class="dynamic-list" data-list="projects">
-                    ${existingProjects.map(project => this.getProjectItemTemplate(project)).join('')}
-                    ${existingProjects.length === 0 ? this.getProjectItemTemplate() : ''}
-                </div>
-                
-                <button type="button" class="btn btn-add" data-list-type="projects">
-                    ➕ Add Another Project
-                </button>
+            <div class="step-header">
+                <div class="step-number">5</div>
+                <h2 class="step-title">Showcase your work</h2>
+                <p class="step-subtitle">Add your best projects with descriptions and links</p>
             </div>
 
-            <div class="alert alert-info">
-                <strong>💡 GitHub Integration:</strong> Projects with the "featured" topic on GitHub will automatically appear in a separate section. Add projects here that you want to describe in detail.
+            <div class="step-form">
+                <div class="dynamic-list" id="projects-list">
+                    ${existingProjects.length > 0 
+                        ? existingProjects.map(project => this.getProjectItem(project)).join('')
+                        : this.getProjectItem()
+                    }
+                </div>
+                
+                <button type="button" class="add-button" id="add-project">
+                    <span>+ Add another project</span>
+                </button>
+
+                <div class="alert alert-info mt-6">
+                    <strong>🚀 GitHub Integration:</strong> Projects with the "featured" topic on GitHub will automatically appear in a separate section.
+                </div>
             </div>
         `;
     }
 
-    getProjectItemTemplate(data = {}) {
+    getProjectItem(data = {}) {
         return `
-            <div class="dynamic-list-item">
-                <div class="dynamic-list-header">
-                    <h4>Project</h4>
-                    <button type="button" class="btn-remove">Remove</button>
+            <div class="dynamic-item">
+                <div class="dynamic-item-header">
+                    <h4 class="dynamic-item-title">Project</h4>
+                    <button type="button" class="remove-button" onclick="this.closest('.dynamic-item').remove()">
+                        ✕
+                    </button>
                 </div>
                 
                 <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1rem; margin-bottom: 1rem;">
                     <div class="form-group">
                         <label class="form-label">Project Name</label>
                         <input type="text" name="project-name" class="form-input" 
-                               placeholder="e.g., E-commerce Platform" value="${data.name || ''}">
+                               placeholder="E-commerce Platform" value="${data.name || ''}">
                     </div>
                     
                     <div class="form-group">
-                        <label class="form-label">Date/Year</label>
+                        <label class="form-label">Year</label>
                         <input type="text" name="project-date" class="form-input" 
-                               placeholder="e.g., 2024" value="${data.date || ''}">
+                               placeholder="2024" value="${data.date || ''}">
                     </div>
                 </div>
                 
                 <div class="form-group">
                     <label class="form-label">Project Description</label>
                     <textarea name="project-description" class="form-textarea" 
-                              placeholder="Describe your project, technologies used, and key features:
-• Built with React, Node.js, and MongoDB
-• Implemented secure payment processing with Stripe
-• Reduced checkout time by 35% through UX improvements">${Array.isArray(data.description) ? data.description.join('\n') : (data.description || '')}</textarea>
+                              placeholder="• Built with React, Node.js, and MongoDB&#10;• Implemented secure payment processing with Stripe&#10;• Reduced checkout time by 35% through UX improvements">${Array.isArray(data.description) ? data.description.join('\n') : (data.description || '')}</textarea>
                     <span class="form-help">One feature or detail per line</span>
                 </div>
                 
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
                     <div class="form-group">
-                        <label class="form-label">Project Link (Optional)</label>
+                        <label class="form-label">Project Link (optional)</label>
                         <input type="url" name="project-link" class="form-input" 
                                placeholder="https://demo.example.com" value="${data.link || ''}">
-                        <span class="form-help">Link to live demo, repository, or case study</span>
+                        <span class="form-help">Link to live demo or repository</span>
                     </div>
                     
                     <div class="form-group">
-                        <label class="form-label">Image Path (Optional)</label>
+                        <label class="form-label">Image Path (optional)</label>
                         <input type="text" name="project-picture" class="form-input" 
                                placeholder="assets/projects/project-image.jpg" value="${data.picture || ''}">
-                        <span class="form-help">Path to project screenshot (you'll upload this later)</span>
+                        <span class="form-help">You'll upload this image later</span>
                     </div>
                 </div>
             </div>
@@ -325,54 +303,52 @@ export class WizardSteps {
         const existingSkills = data.skillCategories || [];
         
         return `
-            <h2>Skills & Technologies</h2>
-            <p class="step-description">
-                Organize your skills into categories like "Programming Languages", "Frameworks", "Tools", or "Certifications".
-            </p>
-
-            <div class="form-section">
-                <h3>Skill Categories</h3>
-                
-                <div class="dynamic-list" data-list="skills">
-                    ${existingSkills.map(category => this.getSkillCategoryTemplate(category)).join('')}
-                    ${existingSkills.length === 0 ? this.getSkillCategoryTemplate() : ''}
-                </div>
-                
-                <button type="button" class="btn btn-add" data-list-type="skills">
-                    ➕ Add Another Category
-                </button>
+            <div class="step-header">
+                <div class="step-number">6</div>
+                <h2 class="step-title">Your skills & expertise</h2>
+                <p class="step-subtitle">Organize your skills into categories like languages, frameworks, and tools</p>
             </div>
 
-            <div class="alert alert-info">
-                <strong>💡 Category Ideas:</strong> Programming Languages, Frameworks & Libraries, Tools & Platforms, Databases, Cloud Services, Certifications, Soft Skills
+            <div class="step-form">
+                <div class="dynamic-list" id="skills-list">
+                    ${existingSkills.length > 0 
+                        ? existingSkills.map(category => this.getSkillCategoryItem(category)).join('')
+                        : this.getSkillCategoryItem()
+                    }
+                </div>
+                
+                <button type="button" class="add-button" id="add-skill-category">
+                    <span>+ Add another category</span>
+                </button>
+
+                <div class="alert alert-info mt-6">
+                    <strong>💡 Category ideas:</strong> Programming Languages, Frameworks, Tools & Platforms, Databases, Cloud Services, Certifications
+                </div>
             </div>
         `;
     }
 
-    getSkillCategoryTemplate(data = {}) {
+    getSkillCategoryItem(data = {}) {
         return `
-            <div class="dynamic-list-item">
-                <div class="dynamic-list-header">
-                    <h4>Skill Category</h4>
-                    <button type="button" class="btn-remove">Remove</button>
+            <div class="dynamic-item">
+                <div class="dynamic-item-header">
+                    <h4 class="dynamic-item-title">Skill Category</h4>
+                    <button type="button" class="remove-button" onclick="this.closest('.dynamic-item').remove()">
+                        ✕
+                    </button>
                 </div>
                 
                 <div class="form-group">
                     <label class="form-label">Category Name</label>
                     <input type="text" name="skill-category-name" class="form-input" 
-                           placeholder="e.g., Programming Languages" value="${data.name || ''}">
+                           placeholder="Programming Languages" value="${data.name || ''}">
                 </div>
                 
                 <div class="form-group">
                     <label class="form-label">Skills</label>
                     <textarea name="skill-items" class="form-textarea" 
-                              placeholder="List your skills, one per line:
-JavaScript
-Python
-React
-Node.js
-Docker">${Array.isArray(data.items) ? data.items.join('\n') : (data.items || '')}</textarea>
-                    <span class="form-help">One skill per line. For certifications, you can add links later in the config file.</span>
+                              placeholder="JavaScript&#10;Python&#10;React&#10;Node.js&#10;Docker">${Array.isArray(data.items) ? data.items.join('\n') : (data.items || '')}</textarea>
+                    <span class="form-help">One skill per line</span>
                 </div>
             </div>
         `;
@@ -380,108 +356,69 @@ Docker">${Array.isArray(data.items) ? data.items.join('\n') : (data.items || '')
 
     getSettingsStep(data = {}) {
         return `
-            <h2>Settings & Features</h2>
-            <p class="step-description">
-                Customize which sections appear on your portfolio and configure additional settings.
-            </p>
-
-            <div class="form-section">
-                <h3>Portfolio Sections</h3>
-                <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Toggle which sections you want to include in your portfolio:</p>
-                
-                <div class="feature-toggle">
-                    <div>
-                        <strong>About Section</strong>
-                        <p style="margin: 0; color: var(--text-muted); font-size: 0.9rem;">Show your personal story and background</p>
-                    </div>
-                    <div class="toggle-switch active" data-feature="aboutEnabled"></div>
-                </div>
-                
-                <div class="feature-toggle">
-                    <div>
-                        <strong>Experience Section</strong>
-                        <p style="margin: 0; color: var(--text-muted); font-size: 0.9rem;">Display your work history and achievements</p>
-                    </div>
-                    <div class="toggle-switch active" data-feature="experienceEnabled"></div>
-                </div>
-                
-                <div class="feature-toggle">
-                    <div>
-                        <strong>Projects Section</strong>
-                        <p style="margin: 0; color: var(--text-muted); font-size: 0.9rem;">Showcase your featured projects</p>
-                    </div>
-                    <div class="toggle-switch active" data-feature="projectsEnabled"></div>
-                </div>
-                
-                <div class="feature-toggle">
-                    <div>
-                        <strong>Skills Section</strong>
-                        <p style="margin: 0; color: var(--text-muted); font-size: 0.9rem;">List your technical and professional skills</p>
-                    </div>
-                    <div class="toggle-switch active" data-feature="skillsEnabled"></div>
-                </div>
-                
-                <div class="feature-toggle">
-                    <div>
-                        <strong>GitHub Projects</strong>
-                        <p style="margin: 0; color: var(--text-muted); font-size: 0.9rem;">Automatically show repositories with "featured" topic</p>
-                    </div>
-                    <div class="toggle-switch active" data-feature="githubProjectsEnabled"></div>
-                </div>
+            <div class="step-header">
+                <div class="step-number">7</div>
+                <h2 class="step-title">Final touches</h2>
+                <p class="step-subtitle">Configure which sections to include and customize your portfolio</p>
             </div>
 
-            <div class="form-section">
-                <h3>Footer Settings</h3>
-                
-                <div class="feature-toggle">
-                    <div>
-                        <strong>Show Social Links in Footer</strong>
-                        <p style="margin: 0; color: var(--text-muted); font-size: 0.9rem;">Display your social links at the bottom of the page</p>
-                    </div>
-                    <div class="toggle-switch active" data-feature="footerSocialLinks"></div>
-                </div>
-                
+            <div class="step-form">
                 <div class="form-group">
-                    <label for="footer-tagline" class="form-label">Footer Tagline</label>
+                    <label class="form-label">Portfolio Sections</label>
+                    <p class="form-help mb-4">Choose which sections to include in your portfolio</p>
+                    
+                    <div class="feature-toggle">
+                        <div class="feature-info">
+                            <h4>About Section</h4>
+                            <p>Show your personal story and background</p>
+                        </div>
+                        <div class="toggle-switch active" data-feature="aboutEnabled"></div>
+                    </div>
+                    
+                    <div class="feature-toggle">
+                        <div class="feature-info">
+                            <h4>Experience Section</h4>
+                            <p>Display your work history and achievements</p>
+                        </div>
+                        <div class="toggle-switch active" data-feature="experienceEnabled"></div>
+                    </div>
+                    
+                    <div class="feature-toggle">
+                        <div class="feature-info">
+                            <h4>Projects Section</h4>
+                            <p>Showcase your featured projects</p>
+                        </div>
+                        <div class="toggle-switch active" data-feature="projectsEnabled"></div>
+                    </div>
+                    
+                    <div class="feature-toggle">
+                        <div class="feature-info">
+                            <h4>Skills Section</h4>
+                            <p>List your technical and professional skills</p>
+                        </div>
+                        <div class="toggle-switch active" data-feature="skillsEnabled"></div>
+                    </div>
+                    
+                    <div class="feature-toggle">
+                        <div class="feature-info">
+                            <h4>GitHub Projects</h4>
+                            <p>Automatically show repositories with "featured" topic</p>
+                        </div>
+                        <div class="toggle-switch active" data-feature="githubProjectsEnabled"></div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="footer-tagline" class="form-label">Footer Message</label>
                     <input type="text" id="footer-tagline" name="footerTagline" class="form-input" 
                            placeholder="Let's connect and build something amazing together!" 
                            value="${data.footerTagline || 'Let\'s connect and build something amazing together!'}">
                     <span class="form-help">A call-to-action or inspiring message for your footer</span>
                 </div>
-            </div>
 
-            <div class="form-section">
-                <h3>Custom Section Titles</h3>
-                
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-                    <div class="form-group">
-                        <label for="projects-title" class="form-label">Projects Section Title</label>
-                        <input type="text" id="projects-title" name="projectsTitle" class="form-input" 
-                               placeholder="Latest Projects" value="${data.projectsTitle || 'Latest Projects'}">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="experience-title" class="form-label">Experience Section Title</label>
-                        <input type="text" id="experience-title" name="experienceTitle" class="form-input" 
-                               placeholder="Professional Experience" value="${data.experienceTitle || 'Professional Experience'}">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="skills-title" class="form-label">Skills Section Title</label>
-                        <input type="text" id="skills-title" name="skillsTitle" class="form-input" 
-                               placeholder="Skills & Technologies" value="${data.skillsTitle || 'Skills & Technologies'}">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="github-title" class="form-label">GitHub Projects Title</label>
-                        <input type="text" id="github-title" name="githubProjectsTitle" class="form-input" 
-                               placeholder="Projects on GitHub" value="${data.githubProjectsTitle || 'Projects on GitHub'}">
-                    </div>
+                <div class="alert alert-success">
+                    <strong>🎉 Almost done!</strong> Review your settings and click "Generate Config" to create your portfolio configuration file.
                 </div>
-            </div>
-
-            <div class="alert alert-success">
-                <strong>🎉 Almost Done!</strong> Review your settings and click "Generate Config" to create your portfolio configuration file.
             </div>
         `;
     }

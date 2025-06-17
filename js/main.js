@@ -1,40 +1,31 @@
-// Main application entry point
+// Main application with modern UX
 import { WizardController } from './wizard-controller.js';
 import { ConfigGenerator } from './config-generator.js';
-import { PreviewManager } from './preview-manager.js';
 
 class PortfolioConfigApp {
     constructor() {
         this.wizardController = new WizardController();
         this.configGenerator = new ConfigGenerator();
-        this.previewManager = new PreviewManager();
-        
         this.currentConfig = {};
         this.init();
     }
 
     init() {
         this.setupEventListeners();
-        this.initializeComponents();
     }
 
     setupEventListeners() {
-        // Start generator button
-        const startBtn = document.getElementById('start-generator');
-        if (startBtn) {
-            startBtn.addEventListener('click', () => {
+        // Start wizard button
+        const startButton = document.getElementById('start-wizard');
+        if (startButton) {
+            startButton.addEventListener('click', () => {
                 this.startWizard();
             });
         }
 
         // Listen for wizard events
-        document.addEventListener('wizard:stepCompleted', (e) => {
-            this.handleStepCompleted(e.detail);
-        });
-
         document.addEventListener('wizard:configUpdated', (e) => {
             this.currentConfig = { ...this.currentConfig, ...e.detail };
-            this.previewManager.updatePreview(this.currentConfig);
         });
 
         document.addEventListener('wizard:completed', () => {
@@ -42,36 +33,76 @@ class PortfolioConfigApp {
         });
     }
 
-    initializeComponents() {
-        this.previewManager.init();
-    }
-
     startWizard() {
-        // Hide the welcome content and show the wizard
+        const welcomeScreen = document.getElementById('welcome-screen');
         const wizardContainer = document.getElementById('wizard-container');
-        if (wizardContainer) {
-            wizardContainer.style.display = 'block';
-            wizardContainer.innerHTML = ''; // Clear any existing content
+        
+        if (welcomeScreen && wizardContainer) {
+            // Hide welcome screen with animation
+            welcomeScreen.style.opacity = '0';
+            welcomeScreen.style.transform = 'scale(0.95)';
             
-            this.wizardController.init(wizardContainer);
-            
-            // Scroll to wizard
-            wizardContainer.scrollIntoView({ behavior: 'smooth' });
+            setTimeout(() => {
+                welcomeScreen.style.display = 'none';
+                wizardContainer.style.display = 'block';
+                
+                // Initialize wizard
+                this.wizardController.init();
+                
+                // Animate wizard in
+                wizardContainer.style.opacity = '0';
+                setTimeout(() => {
+                    wizardContainer.style.opacity = '1';
+                }, 50);
+            }, 300);
         }
-    }
-
-    handleStepCompleted(stepData) {
-        console.log('Step completed:', stepData);
-        // You could add analytics or other tracking here
     }
 
     handleWizardCompleted() {
         const finalConfig = this.configGenerator.generateFinalConfig(this.currentConfig);
-        this.downloadConfig(finalConfig);
+        this.showCompletionScreen(finalConfig);
+    }
+
+    showCompletionScreen(config) {
+        const wizardContainer = document.getElementById('wizard-container');
+        if (!wizardContainer) return;
+
+        wizardContainer.innerHTML = `
+            <div class="completion-screen">
+                <div class="completion-content">
+                    <span class="success-icon">🎉</span>
+                    <h2>Your portfolio is ready!</h2>
+                    <p>We've generated your configuration file. Download it and follow the setup instructions to get your portfolio live.</p>
+                    
+                    <div class="download-section">
+                        <h3 style="color: white; margin-bottom: 1rem;">Next Steps:</h3>
+                        <ol style="text-align: left; display: inline-block; margin: 1rem 0; color: rgba(255,255,255,0.9);">
+                            <li>Download your config.json file</li>
+                            <li>Replace the existing config.json in your portfolio repository</li>
+                            <li>Add project images to assets/projects/ folder</li>
+                            <li>Add company logos to assets/logos/ folder</li>
+                            <li>Commit and push your changes to GitHub</li>
+                        </ol>
+                        
+                        <button class="download-button" id="download-config">
+                            📥 Download config.json
+                        </button>
+                    </div>
+
+                    <button class="btn btn-ghost" onclick="location.reload()" style="color: rgba(255,255,255,0.8); border: 1px solid rgba(255,255,255,0.3); margin-top: 2rem;">
+                        🔄 Create Another Configuration
+                    </button>
+                </div>
+            </div>
+        `;
+
+        // Setup download button
+        document.getElementById('download-config').addEventListener('click', () => {
+            this.downloadConfig(config);
+        });
     }
 
     downloadConfig(config) {
-        // Create and download the config.json file
         const configJson = JSON.stringify(config, null, 2);
         const blob = new Blob([configJson], { type: 'application/json' });
         const url = URL.createObjectURL(blob);
@@ -84,44 +115,22 @@ class PortfolioConfigApp {
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
 
-        // Show success message
-        this.showSuccessMessage();
-    }
-
-    showSuccessMessage() {
-        const wizardContainer = document.getElementById('wizard-container');
-        if (wizardContainer) {
-            wizardContainer.innerHTML = `
-                <div class="completion-screen">
-                    <span class="success-icon">🎉</span>
-                    <h2>Configuration Complete!</h2>
-                    <p>Your config.json file has been downloaded successfully.</p>
-                    
-                    <div class="download-section">
-                        <h3>Next Steps:</h3>
-                        <ol style="text-align: left; display: inline-block; margin: 1rem 0;">
-                            <li>Replace the config.json file in your portfolio repository</li>
-                            <li>Add any project images to the assets/projects/ folder</li>
-                            <li>Add company logos to the assets/logos/ folder</li>
-                            <li>Commit and push your changes to GitHub</li>
-                            <li>Your portfolio will update automatically!</li>
-                        </ol>
-                    </div>
-
-                    <div class="alert alert-info">
-                        <strong>Pro Tip:</strong> You can run this generator again anytime to update your portfolio configuration.
-                    </div>
-
-                    <button class="btn start-btn" onclick="location.reload()">
-                        🔄 Create Another Configuration
-                    </button>
-                </div>
-            `;
+        // Show success feedback
+        const downloadButton = document.getElementById('download-config');
+        if (downloadButton) {
+            const originalText = downloadButton.textContent;
+            downloadButton.textContent = '✅ Downloaded!';
+            downloadButton.style.background = 'var(--accent)';
+            
+            setTimeout(() => {
+                downloadButton.textContent = originalText;
+                downloadButton.style.background = 'var(--white)';
+            }, 2000);
         }
     }
 }
 
-// Initialize the application when the DOM is loaded
+// Initialize the application
 document.addEventListener('DOMContentLoaded', () => {
     new PortfolioConfigApp();
 });
