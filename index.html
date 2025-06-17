@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio Configuration Generator</title>
+    <meta name="description" content="Generate your developer portfolio configuration without coding">
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <!-- Content will be loaded from README.md via JavaScript -->
+        <div id="readme-content">
+            <h1>Portfolio Configuration Generator</h1>
+            <p>Welcome to the Portfolio Configuration Generator! This tool helps you create a complete <code>config.json</code> file for your developer portfolio without any coding experience required.</p>
+            
+            <h2>How It Works</h2>
+            <p>This is a step-by-step wizard that will guide you through:</p>
+            <ol>
+                <li><strong>Basic Information</strong> - Your name, tagline, and description</li>
+                <li><strong>Social Links</strong> - Connect your GitHub, LinkedIn, and other profiles</li>
+                <li><strong>About Section</strong> - Tell your story with multiple paragraphs</li>
+                <li><strong>Experience</strong> - Add your work history and achievements</li>
+                <li><strong>Projects</strong> - Showcase your best work</li>
+                <li><strong>Skills</strong> - Organize your technical and professional skills</li>
+                <li><strong>Settings</strong> - Configure SEO, features, and display options</li>
+            </ol>
+
+            <div style="text-align: center; margin: 2rem 0;">
+                <button id="start-generator" class="start-btn">
+                    🚀 Start Building Your Portfolio
+                </button>
+            </div>
+
+            <h2>What You'll Need</h2>
+            <ul class="feature-list">
+                <li><strong>Basic Information:</strong> Your name, professional tagline, and a brief description</li>
+                <li><strong>GitHub Username:</strong> For profile picture and automatic project fetching</li>
+                <li><strong>Social Media Links:</strong> LinkedIn, Twitter, or other professional profiles (optional)</li>
+                <li><strong>Work Experience:</strong> Company names, roles, dates, and key achievements</li>
+                <li><strong>Projects:</strong> Names, descriptions, and optional images/links</li>
+                <li><strong>Skills:</strong> Technical skills, certifications, or professional competencies</li>
+            </ul>
+
+            <h2>Features</h2>
+            <ul class="feature-list">
+                <li><strong>No Coding Required</strong> - Visual interface for all configuration</li>
+                <li><strong>Step-by-Step Guidance</strong> - Clear instructions for each section</li>
+                <li><strong>Live Preview</strong> - See your changes as you make them</li>
+                <li><strong>Instant Download</strong> - Get your config.json file immediately</li>
+                <li><strong>Smart Defaults</strong> - Sensible defaults for all optional fields</li>
+                <li><strong>Quick Setup</strong> - Complete your portfolio in under 10 minutes</li>
+            </ul>
+
+            <div class="alert alert-info">
+                <strong>Need Help?</strong> Each step includes helpful tips and examples. All fields are clearly labeled with descriptions, and optional fields are marked so you know what you can skip.
+            </div>
+        </div>
+
+        <div class="wizard-container" id="wizard-container" style="display: none;">
+            <!-- The wizard will be dynamically loaded here -->
+        </div>
+    </div>
+
+    <script type="module" src="js/main.js"></script>
+</body>
+</html>
