@@ -3,22 +3,62 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portfolio Configuration Generator</title>
-    <meta name="description" content="Create your developer portfolio configuration with our intuitive, no-code wizard">
-    <link rel="stylesheet" href="css/main.css">
+    <title>Portfolio Configuration Generator - Create Your Developer Portfolio</title>
+    <meta name="description" content="Create your professional developer portfolio configuration with our intuitive, no-code wizard. Build stunning portfolios in minutes.">
+    <meta name="keywords" content="portfolio generator, developer portfolio, no-code, configuration wizard">
+    <meta name="author" content="Portfolio Generator">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="">
+    <meta property="og:title" content="Portfolio Configuration Generator">
+    <meta property="og:description" content="Create your professional developer portfolio configuration with our intuitive, no-code wizard.">
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:title" content="Portfolio Configuration Generator">
+    <meta property="twitter:description" content="Create your professional developer portfolio configuration with our intuitive, no-code wizard.">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚀</text></svg>">
+    
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="css/main.css">
+    
+    <!-- Preload critical resources -->
+    <link rel="preload" href="js/main.js" as="script">
+    <link rel="preload" href="js/wizard-controller.js" as="script">
 </head>
 <body>
     <!-- Welcome Screen -->
     <div class="welcome-screen" id="welcome-screen">
         <div class="welcome-content">
-            <h1>Create Your Portfolio</h1>
-            <p>Build a professional developer portfolio configuration in minutes with our intuitive, step-by-step wizard. No coding required.</p>
-            <button class="start-button" id="start-wizard">
+            <h1>Create Your Dream Portfolio</h1>
+            <p>Transform your career with a stunning, professional developer portfolio. Our intuitive wizard guides you through every step—no coding required, just your story.</p>
+            <button class="start-button" id="start-wizard" aria-label="Start creating your portfolio">
                 Get Started →
             </button>
+            
+            <!-- Feature highlights -->
+            <div style="margin-top: 3rem; display: flex; justify-content: center; gap: 2rem; flex-wrap: wrap; opacity: 0.9;">
+                <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem;">
+                    <span>⚡</span> 5-minute setup
+                </div>
+                <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem;">
+                    <span>🎨</span> Professional design
+                </div>
+                <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem;">
+                    <span>📱</span> Mobile responsive
+                </div>
+                <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem;">
+                    <span>🚀</span> GitHub integration
+                </div>
+            </div>
         </div>
     </div>
 
@@ -35,7 +75,7 @@
                         <div class="progress-fill" id="progress-fill"></div>
                     </div>
                 </div>
-                <button class="close-button" id="close-wizard" title="Close wizard">
+                <button class="close-button" id="close-wizard" title="Close wizard" aria-label="Close portfolio wizard">
                     ✕
                 </button>
             </div>
@@ -51,16 +91,28 @@
         <!-- Navigation -->
         <div class="step-navigation">
             <div class="navigation-content">
-                <button class="nav-button nav-button-prev" id="prev-button" disabled>
+                <button class="nav-button nav-button-prev" id="prev-button" disabled aria-label="Go to previous step">
                     ← Previous
                 </button>
-                <button class="nav-button nav-button-next" id="next-button">
+                <button class="nav-button nav-button-next" id="next-button" aria-label="Go to next step">
                     Next →
                 </button>
             </div>
         </div>
     </div>
 
+    <!-- Loading indicator for better UX -->
+    <div id="loading-indicator" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 9999;">
+        <div class="spinner spinner-lg"></div>
+    </div>
+
+    <!-- Scripts -->
     <script type="module" src="js/main.js"></script>
+    
+    <!-- Analytics placeholder -->
+    <script>
+        // Add your analytics code here
+        // Example: Google Analytics, Plausible, etc.
+    </script>
 </body>
 </html>
